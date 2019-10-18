@@ -2,72 +2,95 @@
 # This is a jupyter notebook development environment with anaconda3, python2.7, some other runtimes and packages.
 
 FROM ubuntu:18.04
-MAINTAINER Mengyu Xu
+MAINTAINER Mooy Xu
 ENV REFRESHED_AT 2019-10-17
 
 
 # Config env
-ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
-ENV PATH=/opt/anaconda/bin:$PATH
+ENV LANG C.UTF-8 LC_ALL=C.UTF-8
+ENV PATH /opt/anaconda/bin:$PATH
 
-# Install system packages
-RUN echo "\e[1;42m[INFO] Installing system packages...\e[0m" && \
-    sed -i '1i\deb http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse\ndeb http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse\ndeb http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse\ndeb http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse\ndeb http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse\ndeb-src http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse\ndeb-src http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse\ndeb-src http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse\ndeb-src http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse\ndeb-src http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse' /etc/apt/sources.list && \
-    apt update --fix-missing && \
-    apt install wget bzip2 ca-certificates libglib2.0-0 libxext6 libsm6 libxrender1 git mercurial subversion -y
+# Install basic system packages & tini
+RUN echo "\e[1;42m[INFO] Installing system packages...\e[0m" &&\
+    sed -i 's/^/#/' /etc/apt/sources.list &&\
+    sed -i '1i\deb http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse\ndeb http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse\ndeb http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse\ndeb http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse\ndeb http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse\ndeb-src http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse\ndeb-src http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse\ndeb-src http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse\ndeb-src http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse\ndeb-src http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse' /etc/apt/sources.list &&\
+    apt update --fix-missing &&\
+    apt install wget bzip2 ca-certificates libglib2.0-0 libxext6 libsm6 libxrender1 git mercurial subversion -y &&\
+    \
+    echo "\e[1;42m[INFO] Installing tini...\e[0m" &&\
+    apt install -y curl grep sed dpkg &&\
+    TINI_VERSION=`curl https://github.com/krallin/tini/releases/latest | grep -o "/v.*\"" | sed 's:^..\(.*\).$:\1:'` &&\
+    curl -L "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini_${TINI_VERSION}.deb" > tini.deb &&\
+    dpkg -i tini.deb &&\
+    \
+    rm tini.deb &&\
+    rm -rf /var/lib/apt/lists/*
+ENTRYPOINT [ "/usr/bin/tini", "--" ]
 
 # Install anaconda
-    #wget https://repo.anaconda.com/archive/Anaconda3-5.3.1-Linux-x86_64.sh -O ~/anaconda.sh && \
-RUN echo "\e[1;42m[INFO] Installing anaconda...\e[0m" && \
+RUN echo "\e[1;42m[INFO] Installing anaconda...\e[0m" &&\
     wget https://mirrors.tuna.tsinghua.edu.cn/anaconda/archive/Anaconda3-5.3.1-Linux-x86_64.sh -O ~/anaconda.sh && \
-    /bin/bash ~/anaconda.sh -b -p /opt/anaconda && \
-    rm ~/anaconda.sh && \
-    echo ". /opt/anaconda/etc/profile.d/conda.sh" >> ~/.bashrc && \
-    echo "conda activate base" >> ~/.bashrc
-
-# Install conda packages & runtimes
-# 1. tensorflow & pytorch
-# 2. python2.7
-# 3. octave  # Passed: conda install gnuplot
-# 4. gcc
-RUN echo "\e[1;42m[INFO] Installing conda packages & runtimes...\e[0m" && \
-    conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/ && \
-    mkdir -p /opt/notebooks && \
-    mkdir -p /root/.jupyter && \
+    /bin/bash ~/anaconda.sh -b -p /opt/anaconda &&\
+    echo ". /opt/anaconda/etc/profile.d/conda.sh" >> ~/.bashrc &&\
+    echo "conda activate base" >> ~/.bashrc &&\
+    mkdir -p /opt/notebooks &&\
+    mkdir -p /root/.jupyter &&\
     \
-    echo "\e[1;42m[INFO] Installing tensorflow pytorch...\e[0m" && \
-    conda install tensorflow pytorch -y --quiet && \
-    \
-    echo "\e[1;42m[INFO] Installing python2.7...\e[0m" && \
-    conda create --name python2 python=2.7 -y --quiet && \
-    conda install ipykernel -n python2 -y --quiet && \
-    /opt/anaconda/envs/python2/bin/ipython kernel install --name python2 && \
-    \
-    echo "\e[1;42m[INFO] Installing octave...\e[0m" && \
-    apt install octave -y &&\
-    conda config --add channels conda-forge && \
-    conda install octave_kernel -y --quiet && \
-    conda install texinfo -y --quiet && \
-    \
-    echo "\e[1;42m[INFO] Installing gcc...\e[0m" && \
-    apt install gcc -y && \
-    pip install jupyter-c-kernel && \
-    install_c_kernel && \
-
-# Clean
-RUN echo "\e[1;42m[INFO] Cleaning...\e[0m" && \
-    apt install -y curl grep sed dpkg && \
-    TINI_VERSION=`curl https://github.com/krallin/tini/releases/latest | grep -o "/v.*\"" | sed 's:^..\(.*\).$:\1:'` && \
-    curl -L "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini_${TINI_VERSION}.deb" > tini.deb && \
-    dpkg -i tini.deb && \
-    rm tini.deb && \
-    apt clean
-
-# Config others
-ADD jupyter_notebook_config.py /root/.jupyter/
+    rm ~/anaconda.sh
+COPY jupyter_notebook_config.py /root/.jupyter/
 EXPOSE 8888
 
-# Run
-ENTRYPOINT [ "/usr/bin/tini", "--" ]
-CMD ["/opt/anconda/bin/jupyter", "notebook"]
+# Install conda runtimes
+# 1. python2.7
+# 2. octave  # Passed: conda install gnuplot
+# 3. gcc
+RUN echo "\e[1;42m[INFO] Installing conda runtimes...\e[0m" &&\
+    apt update --fix-missing &&\
+    conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/ && \
+    \
+    echo "\e[1;42m[INFO] Installing python2.7...\e[0m" &&\
+    conda create --name python2 python=2.7 -y --quiet &&\
+    conda install ipykernel -n python2 -y --quiet &&\
+    /opt/anaconda/envs/python2/bin/ipython kernel install --name python2 &&\
+    \
+    echo "\e[1;42m[INFO] Installing octave...\e[0m" &&\
+    apt install octave -y &&\
+    conda config --append channels conda-forge &&\
+    conda install octave_kernel -y --quiet &&\
+    conda install texinfo -y --quiet &&\
+    \
+    echo "\e[1;42m[INFO] Installing gcc...\e[0m" &&\
+    apt install gcc -y &&\
+    pip install jupyter-c-kernel &&\
+    install_c_kernel &&\
+    \
+    conda clean --all &&\
+    rm -rf ~/.cache/pip &&\
+    rm -rf /var/lib/apt/lists/*
+
+# Install python packages
+# 1. tensorflow
+# 2. pytorch
+# 3. pyod
+# 4. tornado 5.1.1  # Compatible with notebook
+RUN echo "\e[1;42m[INFO] Installing python packages...\e[0m" &&\
+    \
+    echo "\e[1;42m[INFO] Installing tensorflow...\e[0m" &&\
+    conda remove wrapt --force -y &&\
+    pip install tensorflow==2.0.0 &&\
+    \
+    echo "\e[1;42m[INFO] Installing pytorch...\e[0m" &&\
+    conda install pytorch-cpu torchvision-cpu -c pytorch -y --quiet &&\
+    \
+    echo "\e[1;42m[INFO] Installing pyod...\e[0m" &&\
+    pip install pyod==0.7.5 &&\
+    \
+    echo "\e[1;42m[INFO] Installing compatible packages...\e[0m" &&\
+    conda install tornado=5.1.1 -y --quiet &&\
+    \
+    conda clean --all &&\
+    rm -rf ~/.cache/pip
+
+# Default command
+CMD ["/opt/anaconda/bin/jupyter", "notebook"]
 
