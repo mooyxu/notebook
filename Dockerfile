@@ -3,7 +3,7 @@
 
 FROM ubuntu:18.04
 MAINTAINER Mooy Xu
-ENV REFRESHED_AT 2019-10-17
+ENV REFRESHED_AT 2019-12-19
 
 
 # Config env
@@ -66,11 +66,15 @@ RUN echo "\e[1;42m[INFO] Installing conda runtimes...\e[0m" &&\
     rm -rf /var/lib/apt/lists/*
 
 # Install python packages
-# 1. tensorflow
-# 2. pytorch
-# 3. pyod
-# 4. tornado 5.1.1  # Compatible with notebook
+# 1. tornado 5.1.1  # Compatible with notebook
+# 2. tensorflow
+# 3. pytorch
+# 4. pyod
+# 5. pyspark
 RUN echo "\e[1;42m[INFO] Installing python packages...\e[0m" &&\
+    \
+    echo "\e[1;42m[INFO] Installing compatible packages...\e[0m" &&\
+    conda install tornado=5.1.1 -y --quiet &&\
     \
     echo "\e[1;42m[INFO] Installing tensorflow...\e[0m" &&\
     conda remove wrapt --force -y &&\
@@ -82,8 +86,8 @@ RUN echo "\e[1;42m[INFO] Installing python packages...\e[0m" &&\
     echo "\e[1;42m[INFO] Installing pyod...\e[0m" &&\
     pip install pyod==0.7.5 &&\
     \
-    echo "\e[1;42m[INFO] Installing compatible packages...\e[0m" &&\
-    conda install tornado=5.1.1 -y --quiet &&\
+    echo "\e[1;42m[INFO] Installing pyspark...\e[0m" &&\
+    pip install pyspark=2.4.4 &&\
     \
     conda clean --all &&\
     rm -rf ~/.cache/pip

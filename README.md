@@ -17,6 +17,7 @@ A container image of jupyter notebook development environment with anaconda3, py
 * tensorflow
 * pytorch
 * pyod
+* pyspark
 
 
 
@@ -129,3 +130,15 @@ docker run -d --rm -p 8888:8888 --name notebook -v $PWD:/opt/notebooks mooyxu/no
     x = torch.rand(5, 3)
     print(x)
     ```
+
+4. QUICK commands
+
+   ```shell
+   alias pip='docker exec -it notebook pip'
+   alias ipython='docker exec -it notebook ipython'
+   alias octave='docker exec -it notebook octave'
+   alias pyspark='docker exec -it notebook pyspark'
+   alias java='docker exec -it notebook java'
+   ```
+
+   
