@@ -9,8 +9,8 @@ A container image of jupyter notebook development environment with anaconda3, py
 
 * python3
 * python2
-* octave
-* c
+* ~~octave~~
+* ~~c~~
 
 ### Packages :
 
@@ -25,43 +25,34 @@ A container image of jupyter notebook development environment with anaconda3, py
 
 ```shell
 cd /path/to/your/directory/
-docker run -d --rm -p 8888:8888 --name notebook -v $PWD:/opt/notebooks mooyxu/notebook
-# Then open your browser with url `localhost:8888`.
+docker run -d --rm -p 8888:8888 -p 8889:8889 --name notebook -v $PWD:/opt/notebooks mooyxu/notebook
+# Then Open your browser with url `localhost:8888` / `<ip>:8888` for notebook
+#                          or url `localhost:8889` / `<ip>:8889` for lab.
 ```
 
 
 
 ## Usage :
 
-1. GET IMAGE (Optional)
+1. GET IMAGE (Optional, but suggested)
 
-    * PULL (suggested)
+    ```shell
+    docker pull mooyxu/notebook
+    ```
 
-      ```shell
-      docker pull mooyxu/notebook
-      ```
-
-    * or BUILD
-
-      ```shell
-      docker build -t mooyxu/notebook .
-      
-      # Suggested in linux: docker build -t mooyxu/notebook -t mooyxu/notebook:`date -I` .
-      ```
-
-2. ALIAS (Suggested)
+2. ALIAS (Optional, but suggested)
 
     * LINUX
 
       ```shell
-      echo alias notebook=\''docker run -d --rm -p 8888:8888 --name notebook -v $PWD:/opt/notebooks mooyxu/notebook'\' >> ~/.bashrc
+      echo alias notebook=\''docker run -d --rm -p 8888:8888 -p 8889:8889 --name notebook -v $PWD:/opt/notebooks mooyxu/notebook'\' >> ~/.bashrc
       source ~/.bashrc
       ```
 
     * or MAC
 
       ```shell
-      echo alias notebook=\''docker run -d --rm -p 8888:8888 --name notebook -v $PWD:/opt/notebooks mooyxu/notebook'\' >> ~/.bash_profile
+      echo alias notebook=\''docker run -d --rm -p 8888:8888 -p 8889:8889 --name notebook -v $PWD:/opt/notebooks mooyxu/notebook'\' >> ~/.bash_profile
       source ~/.bash_profile
       ```
 
@@ -73,7 +64,7 @@ docker run -d --rm -p 8888:8888 --name notebook -v $PWD:/opt/notebooks mooyxu/no
      cd /path/to/your/directory/
      notebook
      
-     # Depend on step 2, otherwise use command 'docker run -d --rm -p 8888:8888 --name notebook -v $PWD:/opt/notebooks mooyxu/notebook'.
+     # Depend on step 2, otherwise use command 'docker run -d --rm -p 8888:8888 -p 8889:8889 --name notebook -v $PWD:/opt/notebooks mooyxu/notebook'.
      ```
 
    * or WITH PASSWORD
@@ -81,14 +72,16 @@ docker run -d --rm -p 8888:8888 --name notebook -v $PWD:/opt/notebooks mooyxu/no
      ```shell
      docker run -it --rm mooyxu/notebook python -c 'from notebook.auth import passwd; print(passwd())'  # Input PASSWORD, copy OUTPUT, then paste it below
      cd /path/to/your/directory/
-     notebook jupyter notebook --NotebookApp.password='<OUTPUT>'  # [LIKE] notebook jupyter notebook --NotebookApp.password='<OUTPUT>'
+     notebook /bin/bash /opt/run.sh '<OUTPUT>'  # [EXAMPLE] notebook /bin/bash /opt/run.sh 'a1b2c3'
      
-     # Depend on step 2, otherwise use command: docker run -d --rm -p 8888:8888 --name notebook -v $PWD:/opt/notebooks mooyxu/notebook jupyter notebook --NotebookApp.password='<OUTPUT>'.
+     # Depend on step 2, otherwise use command: docker run -d --rm -p 8888:8888 -p 8889:8889 --name notebook -v $PWD:/opt/notebooks mooyxu/notebook /bin/bash /opt/run.sh '<OUTPUT>'.
      ```
 
 4. USE
 
-    Open your browser with url `localhost:8888` or `<ip>:8888`.
+    Open your browser with url `localhost:8888` / `<ip>:8888` for notebook
+    
+    or url `localhost:8889` / `<ip>:8889` for lab.
 
 5. STOP
 
@@ -102,27 +95,37 @@ docker run -d --rm -p 8888:8888 --name notebook -v $PWD:/opt/notebooks mooyxu/no
     docker rmi mooyxu/notebook \
     | docker images | grep mooyxu/notebook | awk '{print $3}' \
     | xargs docker rmi \
-    && sed -i '/mooyxu\/notebook/d' ~/.bashrc  # or MAC: '~/.bash_profile'
+    && sed -i '/mooyxu\/notebook/d' ~/.bashrc  # or MAC: instead of '~/.bash_profile'
     ```
 
 
 
 ## ADVANCED :
 
-1. DEBUG
+1. BUILD
+
+    ```shell
+    docker build -t mooyxu/notebook .
+
+    # Suggested in linux: docker build -t mooyxu/notebook -t mooyxu/notebook:`date -I` .
+    ```
+
+2. DEBUG
 
     ```shell
     docker run -it --rm -p 8888:8888 --name notebook -v $PWD:/opt/notebooks mooyxu/notebook bash
     jupyter notebook
+
+    # Then you will get one or two images: mooyxu/notebook:latest and mooyxu/notebook:<date_of_today>
     ```
 
-2. TEST tensorflow
+3. TEST tensorflow
 
     ```python
     import tensorflow as tf;print(tf.reduce_sum(tf.random.normal([5000, 5000])))
     ```
 
-3. TEST pytorch
+4. TEST pytorch
 
     ```python
     from __future__ import print_function
@@ -131,14 +134,12 @@ docker run -d --rm -p 8888:8888 --name notebook -v $PWD:/opt/notebooks mooyxu/no
     print(x)
     ```
 
-4. QUICK commands
+5. QUICK commands
 
-   ```shell
-   alias pip='docker exec -it notebook pip'
-   alias ipython='docker exec -it notebook ipython'
-   alias octave='docker exec -it notebook octave'
-   alias pyspark='docker exec -it notebook pyspark'
-   alias java='docker exec -it notebook java'
-   ```
-
-   
+    ```shell
+    alias pip='docker exec -it notebook pip'
+    alias ipython='docker exec -it notebook ipython'
+    alias pyspark='docker exec -it notebook pyspark'
+    alias java='docker exec -it notebook java'
+    # alias octave='docker exec -it notebook octave'
+    ```

@@ -3,7 +3,7 @@
 
 FROM ubuntu:18.04
 MAINTAINER Mooy Xu
-ENV REFRESHED_AT 2019-12-19
+ENV REFRESHED_AT 2020-01-21
 
 
 # Config env
@@ -31,17 +31,27 @@ RUN echo "\e[1;42m[INFO] Installing anaconda...\e[0m" &&\
     /bin/bash ~/anaconda.sh -b -p /opt/anaconda &&\
     echo ". /opt/anaconda/etc/profile.d/conda.sh" >> ~/.bashrc &&\
     echo "conda activate base" >> ~/.bashrc &&\
+    \
     mkdir -p /opt/notebooks &&\
     mkdir -p /root/.jupyter &&\
     \
     rm ~/anaconda.sh
 COPY jupyter_notebook_config.py /root/.jupyter/
-EXPOSE 8888
+EXPOSE 8888 8889
 
 # Install conda runtimes
 # 1. python2.7
 # 2. octave  # Passed: conda install gnuplot
+#    echo "\e[1;42m[INFO] Installing octave...\e[0m" &&\
+#    apt install octave -y &&\
+#    conda config --append channels conda-forge &&\
+#    conda install octave_kernel -y --quiet &&\
+#    conda install texinfo -y --quiet &&\
 # 3. gcc
+#    echo "\e[1;42m[INFO] Installing gcc...\e[0m" &&\
+#    apt install gcc -y &&\
+#    pip install jupyter-c-kernel &&\
+#    install_c_kernel &&\
 RUN echo "\e[1;42m[INFO] Installing conda runtimes...\e[0m" &&\
     apt update --fix-missing &&\
     \
@@ -49,17 +59,6 @@ RUN echo "\e[1;42m[INFO] Installing conda runtimes...\e[0m" &&\
     conda create --name python2 python=2.7 -y --quiet &&\
     conda install ipykernel -n python2 -y --quiet &&\
     /opt/anaconda/envs/python2/bin/ipython kernel install --name python2 &&\
-    \
-    echo "\e[1;42m[INFO] Installing octave...\e[0m" &&\
-    apt install octave -y &&\
-    conda config --append channels conda-forge &&\
-    conda install octave_kernel -y --quiet &&\
-    conda install texinfo -y --quiet &&\
-    \
-    echo "\e[1;42m[INFO] Installing gcc...\e[0m" &&\
-    apt install gcc -y &&\
-    pip install jupyter-c-kernel &&\
-    install_c_kernel &&\
     \
     conda clean --all &&\
     rm -rf ~/.cache/pip &&\
@@ -78,7 +77,8 @@ RUN echo "\e[1;42m[INFO] Installing python packages...\e[0m" &&\
     \
     echo "\e[1;42m[INFO] Installing tensorflow...\e[0m" &&\
     conda remove wrapt --force -y &&\
-    pip install tensorflow==2.0.0 &&\
+    echo `pip search tensorflow` &&\
+    pip install tensorflow==2.1.0 &&\
     \
     echo "\e[1;42m[INFO] Installing pytorch...\e[0m" &&\
     conda install pytorch-cpu torchvision-cpu -c pytorch -y --quiet &&\
@@ -87,11 +87,11 @@ RUN echo "\e[1;42m[INFO] Installing python packages...\e[0m" &&\
     pip install pyod==0.7.5 &&\
     \
     echo "\e[1;42m[INFO] Installing pyspark...\e[0m" &&\
-    pip install pyspark=2.4.4 &&\
+    pip install pyspark==2.4.4 &&\
     \
     conda clean --all &&\
     rm -rf ~/.cache/pip
 
 # Default command
-CMD ["/opt/anaconda/bin/jupyter", "notebook"]
-
+COPY run.sh /opt/
+CMD ["/bin/bash", "/opt/run.sh"]
