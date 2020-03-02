@@ -3,7 +3,7 @@
 
 FROM ubuntu:18.04
 MAINTAINER Mooy Xu
-ENV REFRESHED_AT 2020-01-21
+ENV REFRESHED_AT 2020-03-02
 
 
 # Config env
@@ -14,6 +14,7 @@ ENV PATH /opt/anaconda/bin:$PATH
 RUN echo "\e[1;42m[INFO] Installing system packages...\e[0m" &&\
     apt update --fix-missing &&\
     apt install wget bzip2 ca-certificates libglib2.0-0 libxext6 libsm6 libxrender1 git mercurial subversion -y &&\
+    apt install openjdk-8-jdk -y &&\
     \
     echo "\e[1;42m[INFO] Installing tini...\e[0m" &&\
     apt install -y curl grep sed dpkg &&\
@@ -87,7 +88,7 @@ RUN echo "\e[1;42m[INFO] Installing python packages...\e[0m" &&\
     pip install pyod==0.7.5 &&\
     \
     echo "\e[1;42m[INFO] Installing pyspark...\e[0m" &&\
-    pip install pyspark==2.4.4 &&\
+    pip install pyspark==2.4.5 &&\
     \
     conda clean --all &&\
     rm -rf ~/.cache/pip
