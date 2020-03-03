@@ -92,6 +92,7 @@ RUN echo "\e[1;42m[INFO] Installing python packages...\e[0m" &&\
     \
     conda clean --all &&\
     rm -rf ~/.cache/pip
+COPY mysql-connector-java-8.0.19.jar /opt/anaconda/lib/python3.7/site-packages/pyspark/jars/
 
 # Default command
 COPY run.sh /opt/
