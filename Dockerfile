@@ -3,7 +3,7 @@
 
 FROM ubuntu:18.04
 MAINTAINER Mooy Xu
-ENV REFRESHED_AT 2020-03-02
+ENV REFRESHED_AT 2020-03-13
 
 
 # Config env
@@ -66,7 +66,7 @@ RUN echo "\e[1;42m[INFO] Installing conda runtimes...\e[0m" &&\
     rm -rf /var/lib/apt/lists/*
 
 # Install python packages
-# 1. tornado 5.1.1  # Compatible with notebook
+# 1. common pkgs: pymysql=0.9.3, tornado=5.1.1(Compatible with notebook)
 # 2. tensorflow
 # 3. pytorch
 # 4. pyod
@@ -74,11 +74,11 @@ RUN echo "\e[1;42m[INFO] Installing conda runtimes...\e[0m" &&\
 RUN echo "\e[1;42m[INFO] Installing python packages...\e[0m" &&\
     \
     echo "\e[1;42m[INFO] Installing compatible packages...\e[0m" &&\
+    conda install pymysql=0.9.3 -y --quiet &&\
     conda install tornado=5.1.1 -y --quiet &&\
     \
     echo "\e[1;42m[INFO] Installing tensorflow...\e[0m" &&\
     conda remove wrapt --force -y &&\
-    echo `pip search tensorflow` &&\
     pip install tensorflow==2.1.0 &&\
     \
     echo "\e[1;42m[INFO] Installing pytorch...\e[0m" &&\
