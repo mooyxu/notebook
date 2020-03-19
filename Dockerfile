@@ -89,6 +89,7 @@ RUN echo "\e[1;42m[INFO] Installing python packages...\e[0m" &&\
     \
     echo "\e[1;42m[INFO] Installing pyspark...\e[0m" &&\
     pip install pyspark==2.4.5 &&\
+    pip install pyspark[sql] &&\
     \
     conda clean --all &&\
     rm -rf ~/.cache/pip
