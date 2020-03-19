@@ -66,7 +66,9 @@ RUN echo "\e[1;42m[INFO] Installing conda runtimes...\e[0m" &&\
     rm -rf /var/lib/apt/lists/*
 
 # Install python packages
-# 1. common pkgs: pymysql=0.9.3, tornado=5.1.1(Compatible with notebook)
+# 1. common pkgs: pymysql=0.9.3,
+#    DBUtils=1.3,
+#    tornado=5.1.1(Compatible with notebook)
 # 2. tensorflow
 # 3. pytorch
 # 4. pyod
@@ -75,6 +77,7 @@ RUN echo "\e[1;42m[INFO] Installing python packages...\e[0m" &&\
     \
     echo "\e[1;42m[INFO] Installing compatible packages...\e[0m" &&\
     conda install pymysql=0.9.3 -y --quiet &&\
+    pip install DBUtils==1.3 &&\
     conda install tornado=5.1.1 -y --quiet &&\
     \
     echo "\e[1;42m[INFO] Installing tensorflow...\e[0m" &&\
