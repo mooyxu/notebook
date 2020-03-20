@@ -113,7 +113,7 @@ docker run -d --rm -p 8888:8888 -p 8889:8889 --name notebook -v $PWD:/opt/notebo
 2. DEBUG
 
     ```shell
-    docker run -it --rm -p 8888:8888 --name notebook -v $PWD:/opt/notebooks mooyxu/notebook bash
+    docker run -it --rm -p 8888:8888 -p 8889:8889 --name notebook -v $PWD:/opt/notebooks mooyxu/notebook bash
     jupyter notebook
 
     # Then you will get one or two images: mooyxu/notebook:latest and mooyxu/notebook:<date_of_today>
