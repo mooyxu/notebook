@@ -147,4 +147,4 @@ docker run -d --rm -p 8888:8888 -p 8889:8889 --name notebook -v $PWD:/opt/notebo
 
 
 ## Contact :
-email: xumengyu2008@qq.com
+Email: xumengyu2008@qq.com
