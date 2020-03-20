@@ -97,7 +97,7 @@ RUN echo "\e[1;42m[INFO] Installing python packages...\e[0m" &&\
     conda clean --all &&\
     rm -rf ~/.cache/pip
 COPY mysql-connector-java-8.0.19.jar /opt/anaconda/lib/python3.7/site-packages/pyspark/jars/
-# To compatible with pyarrow(pyspark[sql])
+# To compatible with pyarrow(pyspark[sql])>=15 when spark env is lower
 ENV ARROW_PRE_0_15_IPC_FORMAT 1
 
 # Default command
