@@ -3,12 +3,11 @@
 
 FROM ubuntu:18.04
 MAINTAINER Mooy Xu
-ENV REFRESHED_AT 2020-03-19
+ENV REFRESHED_AT 2020-03-20
 
 
 # Config env
 ENV LANG C.UTF-8 LC_ALL=C.UTF-8
-ENV PATH /opt/anaconda/bin:$PATH
 
 # Install basic system packages & tini
 RUN echo "\e[1;42m[INFO] Installing system packages...\e[0m" &&\
@@ -37,6 +36,7 @@ RUN echo "\e[1;42m[INFO] Installing anaconda...\e[0m" &&\
     mkdir -p /root/.jupyter &&\
     \
     rm ~/anaconda.sh
+ENV PATH /opt/anaconda/bin:$PATH
 COPY jupyter_notebook_config.py /root/.jupyter/
 EXPOSE 8888 8889
 
@@ -97,6 +97,8 @@ RUN echo "\e[1;42m[INFO] Installing python packages...\e[0m" &&\
     conda clean --all &&\
     rm -rf ~/.cache/pip
 COPY mysql-connector-java-8.0.19.jar /opt/anaconda/lib/python3.7/site-packages/pyspark/jars/
+# To compatible with pyarrow(pyspark[sql])
+ENV ARROW_PRE_0_15_IPC_FORMAT 1
 
 # Default command
 COPY run.sh /opt/
